@@ -407,7 +407,7 @@ class Map(MacroElement):
                    threshold_scale=None, fill_color='blue', fill_opacity=0.6,
                    line_color='black', line_weight=1, line_opacity=1, name=None,
                    legend_name='', topojson=None, reset=False, smooth_factor=None,
-                   highlight=None):
+                   highlight=None, nb_class=6):
         """
         Apply a GeoJSON overlay to the map.
 
@@ -477,6 +477,9 @@ class Map(MacroElement):
             representation. Leaflet defaults to 1.0.
         highlight: boolean, default False
             Enable highlight functionality when hovering over a GeoJSON area.
+        nb_class: int, default 6
+            The number of distinct colors in the colormap. (Current largest nb_class
+            supported by branca is 253.)
 
         Returns
         -------
@@ -501,8 +504,6 @@ class Map(MacroElement):
         ...              highlight=True)
 
         """
-        if threshold_scale and len(threshold_scale) > 6:
-            raise ValueError
         if data is not None and not color_brewer(fill_color):
             raise ValueError('Please pass a valid color brewer code to '
                              'fill_local. See docstring for valid codes.')
@@ -533,7 +534,7 @@ class Map(MacroElement):
                             if data_max < 0 else 1)
             data_min, data_max = (1.01*data_min-0.01*data_max,
                                   1.01*data_max-0.01*data_min)
-            nb_class = 6
+
             color_domain = [data_min+i*(data_max-data_min)*1./nb_class
                             for i in range(1+nb_class)]
         else:
@@ -552,7 +553,7 @@ class Map(MacroElement):
                 return color_range[len(
                     [u for u in color_domain if
                      get_by_key(x, key_on) in color_data and
-                     u <= color_data[get_by_key(x, key_on)]])]
+                     u <= color_data[get_by_key(x, key_on)]]) - 1]
         else:
             def color_scale_fun(x):
                 return fill_color
