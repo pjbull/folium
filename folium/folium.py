@@ -536,7 +536,7 @@ class Map(MacroElement):
                                   1.01*data_max-0.01*data_min)
 
             color_domain = [data_min+i*(data_max-data_min)*1./nb_class
-                            for i in range(1+nb_class)]
+                            for i in range(nb_class)]
         else:
             color_domain = None
 
